@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useSession, signOut } from "next-auth/react"
 import { QuizSession, AnswerResponse, UserProfile, AdaptiveQuestionResponse, AdaptiveAnswerResponse } from "@/types"
 
-const API_BASE = "http://127.0.0.1:8000/api/v1"
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000") + "/api/v1"
 
 async function climbingFetch(url: string, options: RequestInit = {}) {
   const res = await fetch(url, options)

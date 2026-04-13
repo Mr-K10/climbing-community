@@ -12,3 +12,4 @@ asyncpg
 google-auth
 google-genai
 Pillow
+redis

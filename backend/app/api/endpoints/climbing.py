@@ -76,7 +76,7 @@ async def init_adaptive_quiz(
             "indoor_vs_outdoor": profile.indoor_vs_outdoor
         } if profile else {}
         
-        async with asyncio.timeout(30.0):
+        async with asyncio.timeout(90.0):
             generated_q = await llm_service.generate_adaptive_question(user_prefs, request.keywords)
         
         new_q = Question(

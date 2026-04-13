@@ -4,6 +4,8 @@ import { useSession, signOut } from "next-auth/react"
 import { useRouter, usePathname } from "next/navigation"
 import { useEffect } from "react"
 
+const PUBLIC_ROUTES = ["/login", "/register", "/forgot-password", "/reset-password", "/"]
+
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { data: session, status, update } = useSession()
   const router = useRouter()
@@ -49,7 +51,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     if (status === "loading") return
 
     if (!session) {
-      if (pathname !== "/login" && pathname !== "/") {
+      if (!PUBLIC_ROUTES.includes(pathname)) {
         router.push("/login")
       }
     } else {
@@ -66,13 +68,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     }
   }, [session, status, pathname, router])
 
-  const isGuestPage = pathname === "/login" || pathname === "/";
-  const shouldRedirectAwayFromGuest = !!session && pathname === "/login";
-  const shouldRedirectToLogin = !session && !isGuestPage;
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const shouldRedirectAwayFromPublic = !!session && (pathname === "/login" || pathname === "/register");
+  const shouldRedirectToLogin = !session && !isPublicRoute;
   const shouldRedirectToOnboarding = !!session && !session.user?.onboarding_completed && pathname !== "/onboarding";
   const shouldRedirectAwayFromOnboarding = !!session && !!session.user?.onboarding_completed && pathname === "/onboarding";
 
-  if (status === "loading" || shouldRedirectAwayFromGuest || shouldRedirectToLogin || shouldRedirectToOnboarding || shouldRedirectAwayFromOnboarding) {
+  if (status === "loading" || shouldRedirectAwayFromPublic || shouldRedirectToLogin || shouldRedirectToOnboarding || shouldRedirectAwayFromOnboarding) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>

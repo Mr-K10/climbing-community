@@ -1,0 +1,11 @@
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.db
+sql_app.db
+Dockerfile
+.dockerignore
+.env
+README.md

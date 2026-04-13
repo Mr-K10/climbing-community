@@ -97,7 +97,7 @@ class LLMService:
 
         except Exception as e:
             err_msg = str(e).lower()
-            if any(q in err_msg for q in ["429", "resource_exhausted", "quota", "rate limit"]):
+            if any(q in err_msg for q in ["429", "resource_exhausted", "quota", "rate limit", "503", "unavailable", "timeout", "exceeded"]):
                 llm_manager.report_quota_failure(api_key, model)
             
             print(f"Question generation failed for model {model}: {e}. Retrying with next best...")

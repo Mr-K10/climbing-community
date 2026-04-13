@@ -10,7 +10,8 @@ import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -23,17 +24,30 @@ export default function LoginPage() {
     setError("")
 
     try {
-      const result = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+      const res = await fetch(`${apiBase}/api/v1/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
       })
 
-      if (result?.error) {
-        setError("Invalid email or password")
+      if (res.ok) {
+        // Auto-login after registration
+        const result = await signIn("credentials", {
+          redirect: false,
+          email,
+          password,
+        })
+
+        if (result?.error) {
+          setError("Account created, but could not log in automatically. Please try logging in manually.")
+        } else {
+          router.push("/onboarding")
+          router.refresh()
+        }
       } else {
-        router.push("/profile")
-        router.refresh()
+        const data = await res.json()
+        setError(data.detail || "Registration failed")
       }
     } catch (err) {
       setError("An unexpected error occurred")
@@ -51,13 +65,24 @@ export default function LoginPage() {
               <Mountain className="w-8 h-8 text-primary" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold text-white">Welcome back</CardTitle>
+          <CardTitle className="text-3xl font-bold text-white">Create account</CardTitle>
           <CardDescription className="text-gray-400">
-            Log in to your climbing community account
+            Join the climbing community
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                placeholder="Alex Honnold"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+                className="bg-white/5 border-white/10 focus:border-primary/50"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -91,18 +116,13 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full bg-primary hover:bg-primary/90 text-white h-12 rounded-xl transition-all font-semibold"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Register"}
             </Button>
-            <div className="flex flex-col space-y-4 mt-4">
-              <div className="text-center">
-                <Link href="/forgot-password" title="Forgot password?" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </Link>
-              </div>
-              <p className="text-sm text-gray-400 text-center">
-                Don't have an account?{" "}
-                <Link href="/register" className="text-primary hover:underline font-medium">
-                  Register
+            <div className="text-center mt-4">
+              <p className="text-sm text-gray-400">
+                Already have an account?{" "}
+                <Link href="/login" className="text-primary hover:underline font-medium">
+                  Sign In
                 </Link>
               </p>
             </div>

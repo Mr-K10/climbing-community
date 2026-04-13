@@ -11,7 +11,8 @@ class User(Base):
     __tablename__ = "users"
     id = Column(String, primary_key=True, default=generate_uuid)
     email = Column(String, unique=True, index=True)
-    google_id = Column(String, unique=True, index=True)
+    google_id = Column(String, unique=True, index=True, nullable=True)
+    hashed_password = Column(String, nullable=True)
     name = Column(String)
     onboarding_completed = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
