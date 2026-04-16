@@ -12,8 +12,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
+        const apiBase = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+        console.log(`[AUTH] Attempting login at: ${apiBase}/api/v1/auth/login`)
+        
         try {
-          const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
           const res = await fetch(`${apiBase}/api/v1/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -25,6 +27,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           if (res.ok) {
             const data = await res.json()
+            console.log(`[AUTH] Login successful for: ${credentials.email}`)
             return {
               id: data.data.user.id,
               email: data.data.user.email,
@@ -33,9 +36,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               onboarding_completed: data.data.user.onboarding_completed
             }
           }
+          
+          const errorData = await res.json().catch(() => ({}))
+          console.error(`[AUTH] Login failed with status ${res.status}:`, errorData)
           return null
         } catch (error) {
-          console.error("Auth error:", error)
+          console.error("[AUTH] Request error:", error)
           return null
         }
       }
@@ -50,7 +56,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
         if (session?.action === "refresh" && token.accessToken) {
           try {
-            const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+            const apiBase = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
             const res = await fetch(`${apiBase}/api/v1/auth/refresh`, {
               headers: { "Authorization": `Bearer ${token.accessToken}` },
             })

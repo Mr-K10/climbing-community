@@ -24,13 +24,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@${POSTGRES_HOST:-localhost}:${POSTGRES_PORT:-5240}/${POSTGRES_DB:-climbing_db}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-climbing_db}
       - REDIS_URL=redis://redis:6379/0
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=HS256
-      - POSTGRES_PORT=${POSTGRES_PORT:-5240}
-      - POSTGRES_HOST=${POSTGRES_HOST:-localhost}
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=db
     depends_on:
       - db
       - redis
@@ -50,6 +50,7 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - NEXT_PUBLIC_API_URL=http://${SERVER_IP:-localhost}:8000
+      - BACKEND_URL=http://backend:8000
     depends_on:
       - backend
 
